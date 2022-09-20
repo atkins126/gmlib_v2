@@ -2,7 +2,7 @@ object MainFrm: TMainFrm
   Left = 0
   Top = 0
   Caption = 'MainFrm'
-  ClientHeight = 587
+  ClientHeight = 614
   ClientWidth = 1009
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -11,12 +11,13 @@ object MainFrm: TMainFrm
   Font.Name = 'Segoe UI'
   Font.Style = []
   OnCloseQuery = FormCloseQuery
+  PixelsPerInch = 96
   TextHeight = 15
   object CEFWindowParent1: TCEFWindowParent
     Left = 0
     Top = 0
     Width = 708
-    Height = 464
+    Height = 491
     Align = alClient
     TabStop = True
     TabOrder = 0
@@ -25,7 +26,7 @@ object MainFrm: TMainFrm
     Left = 708
     Top = 0
     Width = 301
-    Height = 464
+    Height = 491
     Align = alRight
     Caption = ' '
     TabOrder = 1
@@ -46,7 +47,7 @@ object MainFrm: TMainFrm
       Left = 1
       Top = 66
       Width = 299
-      Height = 397
+      Height = 424
       ActivePage = tsMapOptions
       Align = alClient
       TabOrder = 1
@@ -226,10 +227,10 @@ object MainFrm: TMainFrm
         end
         object pcObjects: TPageControl
           Left = 0
-          Top = 168
+          Top = 195
           Width = 291
           Height = 199
-          ActivePage = tsStreetViewControl
+          ActivePage = tsMapTypeControl
           Align = alBottom
           TabOrder = 4
           object tsFullScreenControl: TTabSheet
@@ -265,28 +266,35 @@ object MainFrm: TMainFrm
             ImageIndex = 1
             object lMTPosition: TLabel
               Left = 8
-              Top = 56
+              Top = 104
               Width = 43
               Height = 15
               Caption = 'Position'
             end
             object lMTStyle: TLabel
               Left = 8
-              Top = 84
+              Top = 132
               Width = 25
               Height = 15
               Caption = 'Style'
             end
             object lMTIds: TLabel
               Left = 176
-              Top = 24
+              Top = 72
               Width = 15
               Height = 15
               Caption = 'Ids'
             end
+            object lMapTypeId: TLabel
+              Left = 8
+              Top = 24
+              Width = 58
+              Height = 15
+              Caption = 'MapTypeId'
+            end
             object cbMTPosition: TComboBox
               Left = 65
-              Top = 53
+              Top = 101
               Width = 105
               Height = 22
               Style = csOwnerDrawFixed
@@ -295,7 +303,7 @@ object MainFrm: TMainFrm
             end
             object clbMTIds: TCheckListBox
               Left = 176
-              Top = 40
+              Top = 88
               Width = 104
               Height = 65
               ItemHeight = 15
@@ -304,7 +312,7 @@ object MainFrm: TMainFrm
             end
             object cbMapTypeControl: TCheckBox
               Left = 8
-              Top = 24
+              Top = 72
               Width = 129
               Height = 17
               Caption = 'MapTypeControl'
@@ -313,12 +321,21 @@ object MainFrm: TMainFrm
             end
             object cbMTStyle: TComboBox
               Left = 65
-              Top = 81
+              Top = 129
               Width = 105
               Height = 22
               Style = csOwnerDrawFixed
               TabOrder = 3
               OnChange = cbMTStyleChange
+            end
+            object cbMapTypeId: TComboBox
+              Left = 81
+              Top = 21
+              Width = 105
+              Height = 22
+              Style = csOwnerDrawFixed
+              TabOrder = 4
+              OnChange = cbMapTypeIdChange
             end
           end
           object tsRestriction: TTabSheet
@@ -581,12 +598,39 @@ object MainFrm: TMainFrm
             end
           end
         end
+        object cbNoClear: TCheckBox
+          Left = 8
+          Top = 143
+          Width = 97
+          Height = 17
+          Caption = 'NoClear'
+          TabOrder = 5
+          OnClick = cbNoClearClick
+        end
+        object cbKeyboardShortcuts: TCheckBox
+          Left = 120
+          Top = 143
+          Width = 137
+          Height = 17
+          Caption = 'KeyboardShortcuts'
+          TabOrder = 6
+          OnClick = cbKeyboardShortcutsClick
+        end
+        object cbIsFractionalZoomEnabled: TCheckBox
+          Left = 8
+          Top = 166
+          Width = 161
+          Height = 17
+          Caption = 'IsFractionalZoomEnabled'
+          TabOrder = 7
+          OnClick = cbIsFractionalZoomEnabledClick
+        end
       end
     end
   end
   object mEvents: TMemo
     Left = 0
-    Top = 464
+    Top = 491
     Width = 1009
     Height = 123
     Align = alBottom

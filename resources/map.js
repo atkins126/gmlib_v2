@@ -211,8 +211,9 @@ function setMapOptions(BackgroundColor,
   GestureHandling = StrToGestureHandling(GestureHandling); 
   MapTypeControlOptionsMapTypeIds = MapTypeControlOptionsMapTypeIds.split(";"); 
   for (i = 0; i < MapTypeControlOptionsMapTypeIds.length; i++) { 
-    MapTypeControlOptionsMapTypeIds[i] = StrToMapTypeId(MapTypeControlOptionsMapTypeIds[i])
+    MapTypeControlOptionsMapTypeIds[i] = StrToMapTypeId(MapTypeControlOptionsMapTypeIds[i]);
   };
+  MapTypeId = StrToMapTypeId(MapTypeId);
   MapTypeControlOptionsPosition = StrToPosition(MapTypeControlOptionsPosition); 
   MapTypeControlOptionsStyle = StrToMapTypeControlStyle(MapTypeControlOptionsStyle);
   RotateControlOptionsPosition = StrToPosition(RotateControlOptionsPosition); 
@@ -236,16 +237,16 @@ function setMapOptions(BackgroundColor,
                     //disableDefaultUI: --> not coded
                     disableDoubleClickZoom: DisableDoubleClickZoom,
                     //draggable: --> deprecated, not coded
-//                    draggableCursor: DraggableCursor,
-//                    draggingCursor: DraggingCursor,
+                    draggableCursor: DraggableCursor,
+                    draggingCursor: DraggingCursor,
                     fullscreenControl: FullscreenControl,
                     fullscreenControlOptions: {
                                                position: FullscreenControlOptionsPosition
                                               },
-//                    gestureHandling: GestureHandling,
-//                    heading: Heading,
-//                    isFractionalZoomEnabled: IsFractionalZoomEnabled,
-//                    keyboardShortcuts: KeyboardShortcuts,
+                    gestureHandling: GestureHandling,
+                    heading: Heading,
+                    isFractionalZoomEnabled: IsFractionalZoomEnabled,
+                    keyboardShortcuts: KeyboardShortcuts,
                     //mapId: --> not coded 
                     mapTypeControl: MapTypeControl,
                     mapTypeControlOptions: {
@@ -253,10 +254,10 @@ function setMapOptions(BackgroundColor,
                                             position: MapTypeControlOptionsPosition,
                                             style: MapTypeControlOptionsStyle
                                            },
-//                    mapTypeId: MapTypeId,
+                    mapTypeId: MapTypeId,
                     maxZoom: MaxZoom,
                     minZoom: MinZoom,
-//                    noClear: NoClear,
+                    noClear: NoClear,
                     restriction: Restriction,
                     rotateControl: RotateControl,
                     rotateControlOptions: {
@@ -273,7 +274,7 @@ function setMapOptions(BackgroundColor,
                                                position: StreetViewControlOptionsPosition
                                               },
                     //styles: --> to code
-//                    tilt: Tilt,
+                    tilt: Tilt,
                     zoom: Zoom,
                     zoomControl: ZoomControl,
                     zoomControlOptions: {
