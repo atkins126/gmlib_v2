@@ -219,6 +219,7 @@ function setMapOptions(BackgroundColor,
   RotateControlOptionsPosition = StrToPosition(RotateControlOptionsPosition); 
   ScaleControlOptionsStyle = StrToScaleControlStyle(ScaleControlOptionsStyle);
   ZoomControlOptionsPosition = StrToPosition(ZoomControlOptionsPosition); 
+  StreetViewControlOptionsPosition = StrToPosition(StreetViewControlOptionsPosition); 
   Restriction = null;
   if (RestrictionEnabled) {
     Restriction = {
@@ -281,8 +282,70 @@ function setMapOptions(BackgroundColor,
                                          position: ZoomControlOptionsPosition
                                         }
                    };
-  if (map != null)                   
+  if (map != null) {                  
     map.setOptions(mapOptions);  
+  }
+}
+
+/* **********************************
+  this function update layers.
+********************************** */
+function ShowLayers(TrafficShow,                // --> trafficLayer
+                    TrafficAutoRefresh,         // --> trafficLayer
+                    TransitShow,                // --> transitLayer
+                    BicyclingShow,              // --> bicyclingLayer
+                    KmlShow,                    // --> KmlLayer
+                    KmlClickable,               // --> KmlLayer
+                    KmlPreserveViewport,        // --> KmlLayer
+                    KmlScreenOverlays,          // --> KmlLayer
+                    KmlSuppressInfoWindows,     // --> KmlLayer
+                    KmlUrl                      // --> KmlLayer
+                   ) {
+  // traffic layer
+  var trafficOpts = {
+                     autoRefresh: TrafficAutoRefresh
+                    };
+         
+  if (trafficLayer == null)                   
+    trafficLayer = new google.maps.TrafficLayer(trafficOpts);
+  else 
+    trafficLayer.setOptions(trafficOpts);
+  
+  if (TrafficShow) trafficLayer.setMap(map);
+  else trafficLayer.setMap(null);
+
+  // transit layer 
+  if (transitLayer == null)                   
+    transitLayer = new google.maps.TransitLayer();
+  
+  if (TransitShow) transitLayer.setMap(map);
+  else transitLayer.setMap(null);
+
+  // bicycling layer 
+  if (bicyclingLayer == null)                   
+    bicyclingLayer = new google.maps.BicyclingLayer();
+  
+  if (BicyclingShow) bicyclingLayer.setMap(map);
+  else bicyclingLayer.setMap(null);
+  
+  // kml layer
+  var kmlOpts = {
+                 clickable: KmlClickable,
+                 preserveViewport: KmlPreserveViewport,
+                 screenOverlays: KmlScreenOverlays,
+                 suppressInfoWindows: KmlSuppressInfoWindows,
+                 url: KmlUrl
+                }
+  if (KmlUrl == '') 
+    KmlShow = false;
+
+  if (kmlLayer == null) 
+    kmlLayer = new google.maps.KmlLayer(kmlOpts);
+  else 
+    kmlLayer.setOptions(kmlOpts);
+  
+  if (KmlShow) kmlLayer.setMap(map);
+  else kmlLayer.setMap(null);
 }
 
 /* **********************************

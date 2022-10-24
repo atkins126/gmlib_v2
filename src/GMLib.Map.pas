@@ -21,7 +21,7 @@ uses
   {$ENDIF}
 
   GMLib.Classes, GMLib.Sets, GMLib.LatLng, GMLib.LatLngBounds, GMLib.Events,
-  GMLib.HTMLForms;
+  GMLib.HTMLForms, GMLib.Layers;
 
 type
   // @include(..\Help\docs\GMLib.Map.TGMEventsFired.txt)
@@ -301,6 +301,9 @@ type
     procedure SetZoom(const Value: Integer);
     procedure SetZoomControl(const Value: Boolean);
   protected
+    // @exclude
+    function GetAPIUrl: string; override;
+
     // @include(..\Help\docs\GMLib.Classes.IGMControlChanges.PropertyChanged.txt)
     procedure PropertyChanged(Prop: TPersistent; PropName: string);
 
@@ -369,44 +372,11 @@ type
     // @include(..\Help\docs\GMLib.Map.TGMCustomMapOptions.Destroy.txt)
     destructor Destroy; override;
 
-    // @exclude
-    function GetAPIUrl: string; override;
-
     // @include(..\Help\docs\GMLib.Classes.TGMObject.Assign.txt)
     procedure Assign(Source: TPersistent); override;
 
     // @include(..\Help\docs\GMLib.Classes.IGMAPIUrl.APIUrl.txt)
     property APIUrl;
-  end;
-
-  // @include(..\Help\docs\GMLib.Map.TGMTrafficLayer.txt)
-  TGMTrafficLayer = class(TGMPersistentStr)
-  private
-    FTrafficLayerOptions: TGMTrafficLayerOptions;
-    FShow: Boolean;
-    procedure SetShow(const Value: Boolean);
-  protected
-    // @exclude
-    function GetAPIUrl: string; override;
-  public
-    // @include(..\Help\docs\GMLib.Map.TGMTrafficLayer.Create.txt)
-    constructor Create(AOwner: TPersistent); override;
-    // @include(..\Help\docs\GMLib.Map.TGMTrafficLayer.Destroy.txt)
-    destructor Destroy; override;
-
-    // @include(..\Help\docs\GMLib.Classes.TGMObject.Assign.txt)
-    procedure Assign(Source: TPersistent); override;
-
-    // @include(..\Help\docs\GMLib.Classes.IGMToStr.PropToString.txt)
-    function PropToString: string; override;
-
-    // @include(..\Help\docs\GMLib.Classes.IGMAPIUrl.APIUrl.txt)
-    property APIUrl;
-  published
-    // @include(..\Help\docs\GMLib.Map.TGMTrafficLayer.Show.txt)
-    property Show: Boolean read FShow write SetShow;
-    // @include(..\Help\docs\GMLib.Map.TGMTrafficLayer.AutoRefresh.txt)
-    property TrafficLayerOptions: TGMTrafficLayerOptions read FTrafficLayerOptions write FTrafficLayerOptions;
   end;
 
   // @include(..\Help\docs\GMLib.Map.TGMCustomMap.txt)
@@ -437,6 +407,10 @@ type
     FOnMapTypeIdChanged: TGMMapTypeIdChangedEvent;
     FOnZoomChanged: TGMZoomChangedEvent;
     FAfterPageLoaded: TGMAfterPageLoaded;
+    FTrafficLayer: TGMTrafficLayer;
+    FTransitLayer: TGMTransitLayer;
+    FByciclingLayer: TGMByciclingLayer;
+    FKmlLayer: TGMKmlLayer;
     procedure SetActive(const Value: Boolean);
     procedure SetAPILang(const Value: TGMAPILang);
     procedure SetAPIKey(const Value: string);
@@ -456,6 +430,9 @@ type
     // @include(..\Help\docs\GMLib.Map.TGMCustomMap.FBrowser.txt)
     FBrowser: TComponent;
 
+    // @exclude
+    function GetAPIUrl: string; override;
+
     // @include(..\Help\docs\GMLib.Classes.IGMControlChanges.PropertyChanged.txt)
     procedure PropertyChanged(Prop: TPersistent; PropName: string);
 
@@ -472,9 +449,6 @@ type
     procedure SetZoomProperty(Zoom: Integer); virtual; abstract;
     // @include(..\Help\docs\GMLib.Map.TGMCustomMap.DoOpenMap.txt)
     procedure DoOpenMap; virtual;
-
-    // @exclude
-    function GetAPIUrl: string; override;
 
     // @include(..\Help\docs\GMLib.Map.TGMCustomMap.LoadMap.txt)
     procedure LoadMap; virtual; abstract;
@@ -501,6 +475,15 @@ type
     property APIRegion: TGMAPIRegion read FAPIRegion write SetAPIRegion default rUndefined;
     // @include(..\Help\docs\GMLib.Map.TGMCustomMap.IntervalEvents.txt)
     property IntervalEvents: Integer read FIntervalEvents write SetIntervalEvents default 50;
+
+    // @include(..\Help\docs\GMLib.Layers.TGMTrafficLayer.txt)
+    property TrafficLayer: TGMTrafficLayer read FTrafficLayer write FTrafficLayer;
+    // @include(..\Help\docs\GMLib.Layers.TGMTransitLayer.txt)
+    property TransitLayer: TGMTransitLayer read FTransitLayer write FTransitLayer;
+    // @include(..\Help\docs\GMLib.Layers.TGMByciclingLayer.txt)
+    property ByciclingLayer: TGMByciclingLayer read FByciclingLayer write FByciclingLayer;
+    // @include(..\Help\docs\GMLib.Layers.TGMKmlLayer.txt)
+    property KmlLayer: TGMKmlLayer read FKmlLayer write FKmlLayer;
 
     // @include(..\Help\docs\GMLib.Map.TGMCustomMap.OnActiveChange.txt)
     property OnActiveChange: TNotifyEvent read FOnActiveChange write FOnActiveChange;
@@ -580,6 +563,10 @@ begin
     APIRegion := TGMCustomMap(Source).APIRegion;
     IntervalEvents := TGMCustomMap(Source).IntervalEvents;
     Precision := TGMCustomMap(Source).Precision;
+    TrafficLayer.Assign(TGMCustomMap(Source).TrafficLayer);
+    TransitLayer.Assign(TGMCustomMap(Source).TransitLayer);
+    ByciclingLayer.Assign(TGMCustomMap(Source).ByciclingLayer);
+    KmlLayer.Assign(TGMCustomMap(Source).KmlLayer);
   end;
 end;
 
@@ -595,6 +582,10 @@ begin
   FIntervalEvents := 50;
   FPrecision := 6;
   FBrowser := nil;
+  FTrafficLayer := TGMTrafficLayer.Create(Self);
+  FTransitLayer := TGMTransitLayer.Create(Self);
+  FByciclingLayer := TGMByciclingLayer.Create(Self);
+  FKmlLayer := TGMKmlLayer.Create(Self);
 
   FIsUpdating := False;
   FDocLoaded := False;
@@ -603,6 +594,15 @@ end;
 destructor TGMCustomMap.Destroy;
 begin
   SetActive(False);
+
+  if Assigned(FTrafficLayer) then
+    FTrafficLayer.Free;
+  if Assigned(FTransitLayer) then
+    FTransitLayer.Free;
+  if Assigned(FByciclingLayer) then
+    FByciclingLayer.Free;
+  if Assigned(FKmlLayer) then
+    FKmlLayer.Free;
 
   inherited;
 end;
@@ -614,6 +614,11 @@ begin
   Params := PropToString;
   ExecuteJavaScript('setMapOptions', Params);
   ExecuteJavaScript('doMap', '');
+  Params := FTrafficLayer.PropToString + ',' +
+            FTransitLayer.PropToString + ',' +
+            FByciclingLayer.PropToString + ',' +
+            FKmlLayer.PropToString;
+  ExecuteJavaScript('ShowLayers', Params);
 end;
 
 function TGMCustomMap.GetAPIUrl: string;
@@ -629,55 +634,60 @@ begin
 end;
 
 function TGMCustomMap.GetHTMLCode: string;
-var
-  List: TStringList;
-  Stream: TResourceStream;
-  StrTmp: string;
+  function GetResource(Resource, FileName: string;  const Keys, Values: array of string): string;
+  var
+    i: Integer;
+    List: TStringList;
+    Stream: TResourceStream;
+  begin
+    Stream := nil;
+    List := nil;
+    try
+      List := TStringList.Create;
+      try
+        Stream := TResourceStream.Create(HInstance, Resource, RT_RCDATA);
+      except
+        raise EGMCanLoadResource.Create(Language);                              // Can't load map resource.
+      end;
+
+      List.LoadFromStream(Stream);
+
+      for i := 0 to High(Keys) do
+        List.Text := StringReplace(List.Text, Keys[i], Values[i], []);
+
+      {$IFDEF DELPHI2010}
+      Result := TPath.GetTempPath + FileName;
+      {$ELSE}
+      Result := IncludeTrailingPathDelimiter(GetTempPath) + FileName;
+      {$ENDIF}
+      List.SaveToFile(Result);
+    finally
+      if Assigned(Stream) then Stream.Free;
+      if Assigned(List) then List.Free;
+    end;
+  end;
 begin
   if not Assigned(FBrowser) then
     raise EGMUnassignedObject.Create(['Browser'], Language);                    // Object %s unassigned.
 
-  Result := '';
-
-  Stream := nil;
-  List := nil;
-  try
-    List := TStringList.Create;
-    try
-      Stream := TResourceStream.Create(HInstance, ct_RES_MAPA_CODE, RT_RCDATA);
-    except
-      raise EGMCanLoadResource.Create(Language);                                // Can't load map resource.
-    end;
-
-    List.LoadFromStream(Stream);
-
-    // replaces API_KEY variable
-    List.Text := StringReplace(List.Text, ct_API_KEY, FAPIKey, []);
-
-    // replaces API_VER variable
-    StrTmp := TGMTransform.APIVerToStr(FAPIVer);
-    List.Text := StringReplace(List.Text, ct_API_VER, StrTmp, []);
-
-    // replaces API_REGION variable
-    StrTmp := LowerCase(TGMTransform.APIRegionToStr(FAPIRegion));
-    List.Text := StringReplace(List.Text, ct_API_REGION, StrTmp, []);
-
-    // replaces API_LAN variable
-    StrTmp := LowerCase(TGMTransform.APILangToStr(FAPILang));
-    List.Text := StringReplace(List.Text, ct_API_LAN, StrTmp, []);
-
-    {$IFDEF DELPHI2010}
-    StrTmp := TPath.GetTempPath + TPath.DirectorySeparatorChar + ct_FILE_NAME;
-    {$ELSE}
-    StrTmp := IncludeTrailingPathDelimiter(GetTempPath) + ct_FILE_NAME;
-    {$ENDIF}
-    List.SaveToFile(StrTmp);
-
-    Result := StrTmp;
-  finally
-    if Assigned(Stream) then Stream.Free;
-    if Assigned(List) then List.Free;
-  end;
+  GetResource(ct_RES_MAPAJS_CODE, ct_FILE_MAPJS_NAME, [], []);
+  GetResource(ct_RES_LLB_CODE, ct_FILE_LLB_NAME, [], []);
+  GetResource(ct_RES_TRANSF_CODE, ct_FILE_TRANSF_NAME, [], []);
+  Result := GetResource(ct_RES_MAPA_CODE,
+                        ct_FILE_MAP_NAME,
+                        [
+                         ct_API_KEY,
+                         ct_API_VER,
+                         ct_API_REGION,
+                         ct_API_LAN
+                        ],
+                        [
+                         FAPIKey,
+                         TGMTransform.APIVerToStr(FAPIVer),
+                         LowerCase(TGMTransform.APIRegionToStr(FAPIRegion)),
+                         LowerCase(TGMTransform.APILangToStr(FAPILang))
+                        ]
+                       );
 end;
 
 procedure TGMCustomMap.GetMapEvent(Val: THTMLForms);
@@ -819,34 +829,32 @@ begin
 end;
 
 procedure TGMCustomMap.PropertyChanged(Prop: TPersistent; PropName: string);
-(*
-const
-  Str1 = '%s';
-  Str2 = '%s,%s';
-*)
 var
   Params: string;
 begin
-  if not FActive then Exit;
   if csDesigning in ComponentState then Exit;
 
-  if FIsUpdating then
-    Exit;
+  if not FActive then Exit;
+  if FIsUpdating then Exit;
 
-  Params := PropToString;
-  ExecuteJavaScript('setMapOptions', Params);
+  if Pos('TGMMapOptions_', PropName) > 0 then
+  begin
+    Params := PropToString;
+    ExecuteJavaScript('setMapOptions', Params);
+  end;
 
-(*
-  if (Prop is TGMCustomMapOptions) and SameText(PropName, 'Zoom') then
-    ExecuteJavaScript('MapChangeProperty', Format(Str2, [
-                                                         QuotedStr(PropName),
-                                                         IntToStr(TGMCustomMapOptions(Prop).Zoom)
-                                                        ]));
-  if (Prop is TGMLatLng) then
-    ExecuteJavaScript('MapChangeCenter', Format(Str1, [
-                                                       TGMLatLng(Prop).PropToString
-                                                      ]));
-*)
+  if (Pos('TGMTrafficLayer_', PropName) > 0) or
+     (Pos('TGMTransitLayer_', PropName) > 0) or
+     (Pos('TGMByciclingLayer_', PropName) > 0) or
+     (Pos('TGMKmlLayer', PropName) > 0)
+  then
+  begin
+    Params := FTrafficLayer.PropToString + ',' +
+              FTransitLayer.PropToString + ',' +
+              FByciclingLayer.PropToString + ',' +
+              FKmlLayer.PropToString;
+    ExecuteJavaScript('ShowLayers', Params);
+  end;
 
   if Assigned(FOnPropertyChanges) then FOnPropertyChanges(Prop, PropName);
 end;
@@ -1052,9 +1060,9 @@ begin
   if (GetOwner <> nil) and Supports(GetOwner, IGMControlChanges, Intf) then
   begin
     if Assigned(Prop) then
-      Intf.PropertyChanged(Prop, PropName)
+      Intf.PropertyChanged(Prop, Self.ClassName + '_' + PropName)
     else
-      Intf.PropertyChanged(Self, PropName);
+      Intf.PropertyChanged(Self, Self.ClassName + '_' + PropName);
   end
   else
     if Assigned(OnChange) then OnChange(Self);
@@ -1596,44 +1604,6 @@ begin
 
   FPosition := Value;
   ControlChanges('Position');
-end;
-
-{ TGMTrafficLayer }
-
-procedure TGMTrafficLayer.Assign(Source: TPersistent);
-begin
-  inherited;
-
-end;
-
-constructor TGMTrafficLayer.Create(AOwner: TPersistent);
-begin
-  inherited;
-
-end;
-
-destructor TGMTrafficLayer.Destroy;
-begin
-
-  inherited;
-end;
-
-function TGMTrafficLayer.GetAPIUrl: string;
-begin
-  Result := 'https://developers.google.com/maps/documentation/javascript/reference/map#TrafficLayer';
-end;
-
-function TGMTrafficLayer.PropToString: string;
-begin
-
-end;
-
-procedure TGMTrafficLayer.SetShow(const Value: Boolean);
-begin
-  if FShow = Value then Exit;
-
-  FShow := Value;
-  ControlChanges('Show');
 end;
 
 end.

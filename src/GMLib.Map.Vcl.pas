@@ -199,13 +199,22 @@ type
     // @include(..\Help\docs\GMLib.Classes.TGMComponent.AboutGMLib.txt)
     property AboutGMLib;
 
+    // @include(..\Help\docs\GMLib.Layers.TGMCustomMap.TrafficLayer.txt)
+    property TrafficLayer;
+    // @include(..\Help\docs\GMLib.Layers.TGMTransitLayer.txt)
+    property TransitLayer;
+    // @include(..\Help\docs\GMLib.Layers.TGMByciclingLayer.txt)
+    property ByciclingLayer;
+    // @include(..\Help\docs\GMLib.Layers.TGMKmlLayer.txt)
+    property KmlLayer;
+
     // @include(..\Help\docs\GMLib.Map.TGMCustomMap.OnActiveChange.txt)
     property OnActiveChange;
     // @include(..\Help\docs\GMLib.Map.TGMCustomMap.OnIntervalEventsChange.txt)
     property OnIntervalEventsChange;
     // @include(..\Help\docs\GMLib.Map.TGMCustomMap.OnPrecisionChange.txt)
     property OnPrecisionChange;
-    // @include(..\Help\docs\GMLib.Events.TGMPropertyChanges.txt)
+    // @include(..\Help\docs\GMLib.Events.TGMPropertyChangesEvent.txt)
     property OnPropertyChanges;
     // @include(..\Help\docs\GMLib.Map.TGMCustomMap.OnBoundsChanged.txt)
     property OnBoundsChanged;
@@ -286,13 +295,22 @@ type
     // @include(..\Help\docs\GMLib.Classes.TGMComponent.AboutGMLib.txt)
     property AboutGMLib;
 
+    // @include(..\Help\docs\GMLib.Layers.TGMCustomMap.TrafficLayer.txt)
+    property TrafficLayer;
+    // @include(..\Help\docs\GMLib.Layers.TGMTransitLayer.txt)
+    property TransitLayer;
+    // @include(..\Help\docs\GMLib.Layers.TGMByciclingLayer.txt)
+    property ByciclingLayer;
+    // @include(..\Help\docs\GMLib.Layers.TGMKmlLayer.txt)
+    property KmlLayer;
+
     // @include(..\Help\docs\GMLib.Map.TGMCustomMap.OnActiveChange.txt)
     property OnActiveChange;
     // @include(..\Help\docs\GMLib.Map.TGMCustomMap.OnIntervalEventsChange.txt)
     property OnIntervalEventsChange;
     // @include(..\Help\docs\GMLib.Map.TGMCustomMap.OnPrecisionChange.txt)
     property OnPrecisionChange;
-    // @include(..\Help\docs\GMLib.Events.TGMPropertyChanges.txt)
+    // @include(..\Help\docs\GMLib.Events.TGMPropertyChangesEvent.txt)
     property OnPropertyChanges;
     // @include(..\Help\docs\GMLib.Map.TGMCustomMap.OnBoundsChanged.txt)
     property OnBoundsChanged;
@@ -448,7 +466,9 @@ begin
   if Result <> '' then
     Result := Result + ',';
 
-  Result := Result + Format(StrParams, [MapOptions.PropToString]);
+  Result := Result + Format(StrParams, [
+                                        MapOptions.PropToString
+                                       ]);
 end;
 
 procedure TGMMap.SetEnableTimer(State: Boolean);

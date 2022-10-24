@@ -3,7 +3,8 @@ program GMMapChrDemo;
 uses
   Vcl.Forms,
   uCEFApplication,
-  UMainFrm in 'src\UMainFrm.pas' {MainFrm};
+  UMainFrm in 'src\UMainFrm.pas' {MainFrm},
+  UMapFrame in '..\Common Frames\UMapFrame.pas' {MapFrame: TFrame};
 
 {$R *.res}
 
